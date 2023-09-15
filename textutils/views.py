@@ -8,13 +8,13 @@ def index(request):
 
 
 def analyze(request):
-    djtext = request.GET.get("text", "default")
+    djtext = request.POST.get("text", "default")
     print(djtext)
-    removepunc = request.GET.get("removepunc", "off")
-    fullcaps = request.GET.get("fullcaps", "off")
-    newlineremover = request.GET.get("newlineremover", "off")
-    extraspaceremover = request.GET.get("extraspaceremover", "off")
-    charcount = request.GET.get("charcount", "off")
+    removepunc = request.POST.get("removepunc", "off")
+    fullcaps = request.POST.get("fullcaps", "off")
+    newlineremover = request.POST.get("newlineremover", "off")
+    extraspaceremover = request.POST.get("extraspaceremover", "off")
+    charcount = request.POST.get("charcount", "off")
 
     if removepunc == "on":
         punctuations = """!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""
@@ -33,17 +33,18 @@ def analyze(request):
     elif newlineremover == "on":
         analyzed = ""
         for char in djtext:
-            if char != "\n":
-                analyzed + char
+            if char != "\n" and char != "\r":
+                analyzed=analyzed + char
         params = {"purpose": "New line removed", "analyzed_text": analyzed}
         return render(request, "analyze2.html", params)
     elif extraspaceremover == "on":
         analyzed = ""
-        for i, j in enumerate(djtext):
-            if djtext[i] == " " and djtext[i + 1] == " ":
-                analyzed = analyzed + j
-        params = {"purpose": "Extra space removed", "analyzed_text": analyzed}
-        return render(request, "analyze2.html", params)
+        for index, char in enumerate(djtext):
+            if not(djtext[index] == " " and djtext[index+1]==" "):
+                analyzed = analyzed + char
+
+        params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        return render(request, 'analyze2.html', params)
     elif charcount == "on":
         analyzed = 0
         for char in djtext:
